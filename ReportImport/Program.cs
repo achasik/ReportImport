@@ -16,7 +16,8 @@ namespace ReportImport
                 return;
             }
             var fileMask = args[0];
-            AllShares.test();
+            // AllShares.test();
+            Db.Test();
             var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, fileMask, SearchOption.TopDirectoryOnly);
             foreach (var file in files)
             {
