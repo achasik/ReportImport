@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Configuration;
 
 namespace ReportImport
 {
@@ -16,17 +13,9 @@ namespace ReportImport
 
         static Db()
         {
-            //var connectionString = ConfigurationManager.AppSettings["connectionString"];
-            //var client = new MongoClient(connectionString);
-            //db = client.GetDatabase(new MongoUrl(connectionString).DatabaseName);
-
-            var mongoClientSettings = new MongoClientSettings
-            {
-                Server = new MongoServerAddress("ds111876.mlab.com", 3128),
-                Credential = MongoCredential.CreateCredential("heroku_jslzj311", "heroku_jslzj311", "7agimn65odqrtqcop0dacdr9ri")
-            };
-            var client = new MongoClient(mongoClientSettings);
-            db = client.GetDatabase("heroku_jslzj311");
+            var connectionString = ConfigurationManager.AppSettings["connectionString"];
+            var client = new MongoClient(connectionString);
+            db = client.GetDatabase(new MongoUrl(connectionString).DatabaseName);
         }
 
         public static void Test()
