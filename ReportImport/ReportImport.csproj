@@ -68,6 +68,7 @@
     <Compile Include="Db.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Model\Share.cs" />
+    <Compile Include="Model\Trade.cs" />
     <Compile Include="MongoApi.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

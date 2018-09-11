@@ -17,9 +17,7 @@ namespace ReportImport
                 Console.WriteLine("Usage ReportImport.exe filemask");
                 return;
             }
-            var fileMask = args[0];
-            // AllShares.test();
-            // Db.Test();
+            var fileMask = args[0];      
             var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, fileMask, SearchOption.TopDirectoryOnly);
             foreach (var file in files)
             {
@@ -34,16 +32,15 @@ namespace ReportImport
             foreach (XmlNode row in doc.DocumentElement.SelectNodes("//REPORT_DOC/SECTIONS/DB9/R[@ISIN]"))
             {
                 var Isin = row.Attributes["ISIN"].Value;
-                var share = row.Attributes["ACY"] == null ? FindShare(Isin) : FindBond(Isin);
-                
-                if(share.Id == ObjectId.Empty)
+                var isBond = row.Attributes["ACY"] != null;
+                var share = GetShare(Isin, isBond);
+                if (share == null)
                 {
-                    share = MongoApi.Add(share).Result;
+                    Logger.Log($"ISIN {Isin} not found in {fileName}");
+                    continue;
                 }
-                
-                // var ticker = GetTicker(row.Attributes["ISIN"].Value);
 
-                // if (string.IsNullOrEmpty(ticker)) continue;
+       
                 //var date = row.Attributes["D"].Value;
                 //var operation = row.Attributes["Op"].Value == "Покупка" ? "Buy" : "Sell";
                 //var quantity = row.Attributes["Qty"].Value.Substring(0, row.Attributes["Qty"].Value.IndexOf('.'));
@@ -55,23 +52,17 @@ namespace ReportImport
                 //}
             }
         }
-        static Share FindShare (string Isin)
+
+        static Share GetShare(string Isin, bool isBond)
         {
-            var share = MongoApi.Get(new { Isin }).Result;
-            if (share == null) share = AllShares.GetShare(Isin);
+            var share = MongoApi.GetShare(new { Isin }).Result;
             if (share == null)
+                share = isBond ? AllShares.GetShare(Isin) : AllShares.FinBond(Isin);
+            if (share == null) return null;
+            if (share.Id == ObjectId.Empty)
             {
-                if (Isin == "RU000A0JR5Z5")
-                {
-                    share = new Share { Isin = "RU000A0JR5Z5", Ticker = "RUALR", Title = "Русал РДР", Lot = 10 };
-                }
+                share = MongoApi.AddShare(share).Result;
             }
-            return share;
-        }
-        static Share FindBond(string Isin)
-        {
-            var share = MongoApi.Get(new { Isin }).Result;
-            if (share == null) share = AllShares.FindBond(Isin);
             return share;
         }
     }
