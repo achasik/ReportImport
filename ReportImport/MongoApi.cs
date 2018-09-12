@@ -24,26 +24,39 @@ namespace ReportImport
             API_URL = "https://api.mlab.com/api/1/databases/"+dbase+"/collections";
         }
 
-        public static async Task<Share> GetShare(object query)
+        public static T Get<T>(object query)
         {
             string q = null;
-            if (query != null) q = query.ToJson();
-            var url = $"{API_URL}/share?apiKey={API_KEY}&fo=true{(q!=null ?"&q="+q :"" )}";
-            var json = await Program.Client.GetStringAsync(url);
-            return BsonSerializer.Deserialize<Share>(json);
+            if (query != null) q = query.ToJson(new JsonWriterSettings { OutputMode = JsonOutputMode.Strict });
+            var collection = CollectionName<T>();
+            var url = $"{API_URL}/{collection}?apiKey={API_KEY}&fo=true{(q != null ? "&q=" + q : "")}";
+            var json = Program.Client.GetStringAsync(url).Result;
+            return BsonSerializer.Deserialize<T>(json);
         }
 
-        public static async Task<Share> AddShare(Share share)
+
+        public static T Update<T>(T obj)
         {
-            share.Id = ObjectId.GenerateNewId();
-            var json = share.ToJson(new JsonWriterSettings { OutputMode = JsonOutputMode.Strict });
-            var url = $"{API_URL}/share?apiKey={API_KEY}";
+            // share.Id = ObjectId.GenerateNewId();
+            var collection = CollectionName<T>();
+            var json = obj.ToJson(new JsonWriterSettings { OutputMode = JsonOutputMode.Strict });
+            var url = $"{API_URL}/{collection}?apiKey={API_KEY}";
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var result = await Program.Client.PostAsync(url, content);
-            var resultContent = await result.Content.ReadAsStringAsync();
-            var updated = BsonSerializer.Deserialize<Share>(resultContent);
+            var result = Program.Client.PostAsync(url, content).Result;
+            var resultContent = result.Content.ReadAsStringAsync().Result;
+            var updated = BsonSerializer.Deserialize<T>(resultContent);
             return updated;
         }
+
+        static string CollectionName<T>()
+        {
+            var name = typeof(T).Name;
+            if (name == "Share") return "share";
+            if (name == "Trade") return "trade";
+            if (name == "Position") return "position";
+            throw new ArgumentException($"Unknown typename {name}");
+                
+        }        
 
     }
 }

@@ -11,7 +11,7 @@ namespace ReportImport.Model
     class Share
     {
         [BsonId]
-        public ObjectId  Id { get; set; }
+        public ObjectId?  Id { get; set; }
         public string Isin { get; set; }
         public string Ticker { get; set; }
         public string Title { get; set; }
