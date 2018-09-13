@@ -64,15 +64,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AllShares.cs" />
-    <Compile Include="Db.cs" />
-    <Compile Include="Logger.cs" />
+    <Compile Include="Moex.cs" />
     <Compile Include="Model\Position.cs" />
     <Compile Include="Model\Share.cs" />
     <Compile Include="Model\Trade.cs" />
     <Compile Include="MongoApi.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Report.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

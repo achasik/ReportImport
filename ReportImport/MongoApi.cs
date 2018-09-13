@@ -1,14 +1,10 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
-using ReportImport.Model;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ReportImport
 {
@@ -21,15 +17,20 @@ namespace ReportImport
         {
             API_KEY = ConfigurationManager.AppSettings["mongoApiKey"];
             var dbase = ConfigurationManager.AppSettings["mongoDbase"];
-            API_URL = "https://api.mlab.com/api/1/databases/"+dbase+"/collections";
+            API_URL = "https://api.mlab.com/api/1/databases/" + dbase + "/collections";
         }
 
-        public static T Get<T>(object query)
+
+        public static T Find<T>(object query)
+        {
+            return Get<T>(query, true);
+        }
+        public static T Get<T>(object query, bool first = false)
         {
             string q = null;
             if (query != null) q = query.ToJson(new JsonWriterSettings { OutputMode = JsonOutputMode.Strict });
             var collection = CollectionName<T>();
-            var url = $"{API_URL}/{collection}?apiKey={API_KEY}&fo=true{(q != null ? "&q=" + q : "")}";
+            var url = $"{API_URL}/{collection}?apiKey={API_KEY}{(first ? "&fo=true" : "")}{(q != null ? "&q=" + q : "")}";
             var json = Program.Client.GetStringAsync(url).Result;
             return BsonSerializer.Deserialize<T>(json);
         }
@@ -50,13 +51,13 @@ namespace ReportImport
 
         static string CollectionName<T>()
         {
-            var name = typeof(T).Name;
+            var name = typeof(T).Name.Replace("[]", "");
             if (name == "Share") return "share";
             if (name == "Trade") return "trade";
             if (name == "Position") return "position";
             throw new ArgumentException($"Unknown typename {name}");
-                
-        }        
+
+        }
 
     }
 }

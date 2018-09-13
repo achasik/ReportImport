@@ -5,10 +5,10 @@ using System.Xml;
 
 namespace ReportImport
 {
-    static class AllShares
+    static class Moex
     {
         static XmlDocument doc;
-        static AllShares()
+        static Moex()
         {
             doc = new XmlDocument();
             doc.Load("https://iss.moex.com/iss/engines/stock/markets/shares/securities.xml");
@@ -35,7 +35,7 @@ namespace ReportImport
             return share;
         }
 
-        public static Share FinBond(string isin)
+        public static Share GetBond(string isin)
         {
             var url = $"https://iss.moex.com/iss/securities.xml?q={isin}&iss.meta=off";
             var doc = new XmlDocument();
